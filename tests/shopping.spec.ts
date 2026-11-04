@@ -12,7 +12,7 @@ test.beforeEach(async ({page}) => {
     await loginPage.loginUser('rebecca.oo@yopmail.com','grapeseed@123');
 });
 
-test.only("Purchase Desktop and Notebook", async ({ page }) => {
+test("Purchase Desktop and Notebook", async ({ page }) => {
     await page.getByRole('link', { name: 'Computers' }).first().hover();
     await page.getByRole('link', { name: 'Desktops' }).click();
     await page.locator('#products-pagesize').selectOption('4');
