@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { HomePage } from '../pages/HomePage';
 import { RegisterPage } from '../pages/RegisterPage';
+import { CheckoutPage } from '../pages/CheckoutPage';
+import { WishlistPage } from '../pages/WishlistPage';
 
 test.beforeEach(async ({page}) => {
     const homePage = new HomePage(page);
@@ -13,28 +15,32 @@ test.beforeEach(async ({page}) => {
 });
 
 test("Purchase Desktop and Notebook", async ({ page }) => {
-    await page.getByRole('link', { name: 'Computers' }).first().hover();
-    await page.getByRole('link', { name: 'Desktops' }).click();
-    await page.locator('#products-pagesize').selectOption('4');
-    await page.waitForTimeout(5000); // Wait 5 seconds
+    const homePage = new HomePage(page);
+    const checkoutPage = new CheckoutPage(page);
 
-    let ProductDetails = '';
-    const displayProducts = await page.locator('div.product-grid').locator('div.product-item').all();
-    if (displayProducts.length > 0) {
-        for (const product of displayProducts) {
-            ProductDetails += await product.locator('h2.product-title').textContent() || '';
-            ProductDetails += await product.locator('div.prices').textContent() || '';
-        }
-    }
+    // Clear the items from Cart before add product
+    await checkoutPage.clearCart();
 
-    await expect(displayProducts.length).toBe(4);
-    await expect(ProductDetails).toContain('Build your own cheap computer');
-    await expect(ProductDetails).toContain('800.00');
-    await expect(ProductDetails).toContain('Build your own computer');
-    await expect(ProductDetails).toContain('1200.00');
-    await expect(ProductDetails).toContain('Build your own expensive computer');
-    await expect(ProductDetails).toContain('1800.00');
-    await expect(ProductDetails).toContain('Desktop PC with CDRW');
-    await expect(ProductDetails).toContain('500.00');
+    // Add products to cart
+    await checkoutPage.addCustomDesktopToCart();
+    await checkoutPage.addNotebookToCart();
+
+    // Go to cart
+    await homePage.clickShopping();
+
+    // Checkout process
+    await checkoutPage.proceedCheckout();
+
+    // Confirm and verify final order details
+    await checkoutPage.continueButton.click();
+
+    // Check the final order
+    const orderBody = page.locator('body');
+    await page.fill('#BillingNewAddress_Company', 'GrapeSEED');    
+    await page.selectOption('#BillingNewAddress_CountryId', 'United States');
+    await page.selectOption('#BillingNewAddress_StateProvinceId','Alaska');
+    await page.fill('#BillingNewAddress_City', 'Anchorage');
+    await page.fill('#BillingNewAddress_Address1', '632 West 6th Avenue, Anchorage, AK 99501');
+    await page.fill('#BillingNewAddress_ZipPostalCode', '99524');
+    await page.fill('#BillingNewAddress_PhoneNumber', '(907) 343-8192');
 });
-

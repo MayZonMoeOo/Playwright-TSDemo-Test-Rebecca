@@ -12,7 +12,7 @@ export class DashboardPage {
     readonly jewelryLink: Locator;
     readonly giftcardLink: Locator;
     readonly wishlistTableRows: Locator;
-    readonly shoppingTableRows: Locator;
+    readonly cartTableRows: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -24,7 +24,7 @@ export class DashboardPage {
         this.jewelryLink = page.locator('div.top-menu').locator('a.top-menu-triangle');
         this.giftcardLink = page.locator('div.top-menu').locator('a.top-menu-triangle');
         this.wishlistTableRows = page.locator('table.cart').locator('tr.cart-item-row');
-        this.shoppingTableRows = page.locator('table.cart').locator('tr.cart-item-row');
+        this.cartTableRows = page.locator('table.cart').locator('tr.cart-item-row');
     }
      // Clear the items from Wishlist
     async clearWishlist() {
@@ -49,10 +49,10 @@ export class DashboardPage {
         await homePage.clickShopping;
 
         // Check the items and clear
-        const shoppingitems = await this.shoppingTableRows.all();
+        const cartitems = await this.cartTableRows.all();
 
-        if (shoppingitems.length > 0) {
-            for (const item of shoppingitems) {
+        if (cartitems.length > 0) {
+            for (const item of cartitems) {
                 await item.locator('td.remove-from-cart input[type="checkbox"]').click();
             }
             await this.page.getByRole('button', { name: 'Update shopping cart' }).click();
