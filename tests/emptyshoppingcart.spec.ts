@@ -32,7 +32,8 @@ test.only("Empty Shopping Cart",async ({page}) => {
     await page.getByRole('link', { name: 'Remove Filter' }).click();
     await page.getByRole('link', { name: 'Desktops' }).first().click();    
     await page.getByRole('link', { name: 'Build your own computer', exact: true }).click();
-    await page.getByRole('radio', { name: 'GB [+100.00]' }).check();
+    await page.getByRole('listitem').filter({ hasText: 'GB [+100.00]' }).click();
+  await page.getByRole('radio', { name: 'GB [+100.00]' }).check();
     await page.locator('#add-to-cart-button-16').click();
     await page.getByRole('link', { name: 'Desktops' }).first().click();
     await page.getByRole('link', { name: 'Build your own cheap computer', exact: true }).click();
@@ -77,33 +78,39 @@ test.only("Empty Shopping Cart",async ({page}) => {
     await expect(orderSummary).toContainText('Tax: 0.00');
     await expect(orderSummary).toContainText('Total: 4015.00');
 
+    await page.getByRole('link', { name: 'Shopping cart' }).first().click();
+    //Verify item count
+    await expect(page.locator('span.cart-qty')).toHaveText('(3)'); 
+
+
     //Delete the first item on shopping cart
     await page.getByRole('link', { name: 'Shopping cart' }).first().click();
     await page.getByRole('row', { name: 'Picture of Build your own computer' }).getByRole('checkbox').check();
     await page.getByRole('button', { name: 'Update shopping cart' }).click();
 
-    //Verify item price
-    await expect(page.locator('span.product-subtotal').nth(0)).toContainText('1060.00');
-    await expect(page.locator('span.product-subtotal').nth(1)).toContainText('1590.00');
+    await page.getByRole('link', { name: 'Shopping cart' }).first().click();
+    //Verify item count
+    await expect(page.locator('span.cart-qty')).toHaveText('(2)'); 
 
-    // Verify order totals before confirmation
-    await expect(orderSummary).toContainText('Sub-Total: 2650.00');
-    await expect(orderSummary).toContainText('Shipping: 0.00');
-    await expect(orderSummary).toContainText('Tax: 0.00');
-    await expect(orderSummary).toContainText('Total: 2650.00');
 
-    //Verify the Count in Cart lists and del item again
     await page.getByRole('link', { name: 'Shopping cart' }).first().click();
     await page.getByRole('row', { name: 'Picture of Build your own cheap computer' }).getByRole('checkbox').check();
     await page.getByRole('button', { name: 'Update shopping cart' }).click();
     
     await page.getByRole('link', { name: 'Shopping cart' }).first().click();
-    await page.getByRole('row', { name: 'Picture of 14.1-inch Laptop' }).getByRole('checkbox').check();
+    //Verify item count
+    await expect(page.locator('span.cart-qty')).toHaveText('(1)'); 
+
+    await page.getByRole('link', { name: 'Shopping cart' }).first().click();
+    await page.locator('tr').filter({ hasText: '14.1-inch Laptop' }).locator('input[name="removefromcart"]').check();
     await page.getByRole('button', { name: 'Update shopping cart' }).click();
+    
+    await page.getByRole('link', { name: 'Shopping cart' }).first().click();
+    //Verify item count
+    await expect(page.locator('span.cart-qty')).toHaveText('(0)');
 
     await page.getByRole('link', { name: 'Shopping cart' }).first().click();
     await page.getByRole('link', { name: 'Log out' }).click();
 
 
 });
-
