@@ -28,7 +28,7 @@ test("Search Products and Add to Wishlist", async ({ page }) => {
 
 });
 
-test("Choose Desktop and NoteBook", async ({page}) => {
+test("Dashboard Test", async ({page}) => {
     //await page.goto("https://demowebshop.tricentis.com/");
     //await page.pause();
 

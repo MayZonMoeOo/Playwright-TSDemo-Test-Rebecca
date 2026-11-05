@@ -63,7 +63,7 @@ This project includes six automated test scenarios—implemented using Playwrigh
 ---
 
 ### Scenario 1: Register New User
-* **File:** `tests/Register.spec.ts`
+* **File:** `tests/registertest.spec.ts`
 * **Test Name:** `Register New User`
 * **Flow:** Creates a new user successfully with valid details.
 * **Steps:** 
@@ -76,8 +76,8 @@ This project includes six automated test scenarios—implemented using Playwrigh
 
 ---
 
-### Scenario 2: Register Existing User
-* **File:** `tests/Register.spec.ts`
+### Register Existing User
+* **File:** `tests/registertest.spec.ts`
 * **Test Name:** `Register Existing User`
 * **Flow:** Prevents registration using an email that already exists.
 * **Steps:** 
@@ -88,9 +88,9 @@ This project includes six automated test scenarios—implemented using Playwrigh
 
 ---
 
-### Scenario 3: Login with Valid Credentials
-* **File:** `tests/Login.spec.ts`
-* **Test Name:** `Login with Valid Credentials`
+### Scenario 2: Login Test
+* **File:** `tests/logintest.spec.ts`
+* **Test Name:** `Login Test`
 * **Flow:** Allows a registered user to log in successfully.
 * **Steps:** 
   * Opens the home page and clicks Login.
@@ -101,9 +101,9 @@ This project includes six automated test scenarios—implemented using Playwrigh
 
 ---
 
-### Scenario 4: Login with Invalid Credentials
-* **File:** `tests/Login.spec.ts`
-* **Test Name:** `Login with Invalid Credentials`
+### Scenario 4: Invalid Login Test
+* **File:** `tests/invalidlogintest.spec.ts`
+* **Test Name:** `Invalid Login Test`
 * **Flow:** Shows error messages when logging in with incorrect credentials.
 * **Steps:**
   * **Case A (Wrong Password):** Enters a valid email with a wrong password (`wrong`) and clicks Login.
@@ -113,3 +113,51 @@ This project includes six automated test scenarios—implemented using Playwrigh
   * For unregistered email, expects the error message: `Login was unsuccessful. Please correct the errors and try again.` and `No customer account found`.
 
 ---
+
+### Scenario 4: Dashboard Test
+* **File:** `tests/dashboard.spec.ts`
+* **Test Name:** `Dashboard Test`
+* **Flow:** Tests hovering over the menu, filtering notebooks by display count and attributes, managing wishlist items, adding items to the shopping cart, and verifying notification messages and menu counts.
+* **Steps:**
+  * Hovers over the Computers Menu and clicks Notebooks.
+  * Selects 4 on the Display dropdown menu.
+  * Checks the '16GB' checkbox under Filter by attributes, then unchecks it.
+  * Adds the second and third items to the wishlist.
+  * Adds the fourth, fifth, and sixth items to the shopping cart.
+* **Expected Result:**
+  * Expects a notification text: The product has been added to your wishlist after adding each wishlist item.
+  * Expects a notification text: The product has been added to your shopping cart after adding each shopping cart item.
+
+  ---
+
+  ### Scenario 5: Shopping Cart Test
+* **File:** `tests/shoppingcarttest.spec.ts`
+* **Test Name:** `Shopping Cart Test`
+* **Flow:** Tests hovering over the shopping cart menu, navigating to the shopping cart page, verifying cart buttons, and verifying that the sum of all item prices is equal to the total price at the end of the page.
+* **Steps:**
+  * Hovers over the Shopping Cart menu.
+  * Verifies that the 'Go To Cart' button is displayed and clicks it.
+  * Verifies successful navigation to the Shopping Cart page.
+  * Verifies that the buttons ('Update shopping cart', 'Continue shopping', and 'Estimate shipping') are displayed.
+  * Verifies that the price sum for all items equals the Total Price at the end of the page.
+* **Expected Result:**
+  * Successfully navigates to the Shopping Cart page.
+  * Verifies that all required buttons are correctly displayed.
+  * Confirms that the sum of individual item totals matches the final Total: amount shown on the page.
+
+  ---
+
+  ### Scenario 6: Empty Shopping Cart Test
+* **File:** `tests/emptyshoppingcarttest.spec.ts`
+* **Test Name:** `Empty Shopping Cart Test`
+* **Flow:** Tests deleting items from the shopping cart one by one, verifying that the item count decreases, confirming that the shopping cart becomes empty, and closing the browser.
+* **Steps:**
+  * Deletes the first item in the shopping cart.
+  * Repeats deletion steps until the last item is removed.
+  * Closes the browser.
+* **Expected Result:**
+  * Verifies that the number of elements in the Shopping Cart table decreases by 1 after each deletion.
+  * Verifies that the Shopping Cart is completely empty.
+  * uccessfully closes the browser session.
+
+  ---
