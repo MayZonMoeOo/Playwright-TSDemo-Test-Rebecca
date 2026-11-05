@@ -14,7 +14,7 @@ test.beforeEach(async ({page}) => {
     await loginPage.loginUser(VALID_USER.email,VALID_USER.password);
 });
 
-test("Shopping Cart Total",async ({page}) => {
+test.only("Shopping Cart Total",async ({page}) => {
     //await page.goto("https://demowebshop.tricentis.com/");
     //await page.pause();
     await page.getByRole('link', { name: 'Shopping cart' }).first().click();
