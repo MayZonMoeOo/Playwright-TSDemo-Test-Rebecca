@@ -15,8 +15,7 @@ test.beforeEach(async ({page}) => {
 });
 
 test.only("Shopping Cart Total",async ({page}) => {
-    //await page.goto("https://demowebshop.tricentis.com/");
-    //await page.pause();
+
         const homePage = new HomePage(page);
         const wishlistPage = new WishlistPage(page);
         const cartlistPage = new ShoppingPage(page);
