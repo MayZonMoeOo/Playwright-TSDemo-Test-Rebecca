@@ -14,7 +14,7 @@ test.beforeEach(async ({page}) => {
     await loginPage.loginUser(VALID_USER.email,VALID_USER.password);
 });
 
-test.only("Empty Shopping Cart",async ({page}) => {
+test("Empty Shopping Cart",async ({page}) => {
         const homePage = new HomePage(page);
         const wishlistPage = new WishlistPage(page);
         const cartlistPage = new ShoppingPage(page);
@@ -33,7 +33,8 @@ test.only("Empty Shopping Cart",async ({page}) => {
     await page.getByRole('link', { name: 'Desktops' }).first().click();    
     await page.getByRole('link', { name: 'Build your own computer', exact: true }).click();
     await page.getByRole('listitem').filter({ hasText: 'GB [+100.00]' }).click();
-  await page.getByRole('radio', { name: 'GB [+100.00]' }).check();
+    await page.getByRole('radio', { name: 'GB [+100.00]' }).check();
+    //await page.getByText('8 GB', { exact: false }).first().click();
     await page.locator('#add-to-cart-button-16').click();
     await page.getByRole('link', { name: 'Desktops' }).first().click();
     await page.getByRole('link', { name: 'Build your own cheap computer', exact: true }).click();
@@ -44,16 +45,10 @@ test.only("Empty Shopping Cart",async ({page}) => {
     await page.getByRole('link', { name: 'Notebooks' }).first().click();
     await page.getByRole('link', { name: '14.1-inch Laptop', exact: true }).click();
     await page.locator('#add-to-cart-button-31').click();
-    await page.getByRole('link', { name: 'Jewelry' }).first().click();
-    await page.locator('#products-pagesize').selectOption('4');
-    await page.getByRole('link', { name: 'Black & White Diamond Heart', exact: true }).click();
-    await page.getByRole('button', { name: 'Add to wishlist' }).click();
-    await page.getByRole('link', { name: 'Shopping cart' }).first().click();
-    await page.getByRole('link', { name: 'Wishlist' }).first().click();
 
     await page.getByRole('link', { name: 'Shopping cart' }).first().click();
-    await page.locator('tr:has-text("Build your own computer")').locator('.product-subtotal').click();    
-    await page.locator('tr:has-text("Build your own cheap computer")').locator('.product-subtotal').click();
+    await page.locator('table.cart tr:has-text("Build your own computer") .product-subtotal').click();
+    await page.locator('table.cart tr:has-text("Build your own cheap computer") .product-subtotal').click();
     await page.locator('tr:has-text("14.1-inch Laptop")').locator('.product-subtotal').click();
 
 
@@ -85,7 +80,8 @@ test.only("Empty Shopping Cart",async ({page}) => {
 
     //Delete the first item on shopping cart
     await page.getByRole('link', { name: 'Shopping cart' }).first().click();
-    await page.getByRole('row', { name: 'Picture of Build your own computer' }).getByRole('checkbox').check();
+    await page.locator('tr').filter({ hasText: 'Build your own computer' }).locator('input[name="removefromcart"]').check();
+    //await page.getByRole('row', { name: 'Picture of Build your own computer' }).getByRole('checkbox').check();
     await page.getByRole('button', { name: 'Update shopping cart' }).click();
 
     await page.getByRole('link', { name: 'Shopping cart' }).first().click();
@@ -94,7 +90,8 @@ test.only("Empty Shopping Cart",async ({page}) => {
 
 
     await page.getByRole('link', { name: 'Shopping cart' }).first().click();
-    await page.getByRole('row', { name: 'Picture of Build your own cheap computer' }).getByRole('checkbox').check();
+    await page.locator('tr').filter({ hasText: 'Build your own cheap computer' }).locator('input[name="removefromcart"]').check();
+    //await page.getByRole('row', { name: 'Picture of Build your own cheap computer' }).getByRole('checkbox').check();
     await page.getByRole('button', { name: 'Update shopping cart' }).click();
     
     await page.getByRole('link', { name: 'Shopping cart' }).first().click();

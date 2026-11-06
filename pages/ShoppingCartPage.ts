@@ -6,12 +6,14 @@ export class ShoppingPage {
     readonly searchInput: Locator;
     readonly searchButton: Locator;
     readonly cartTableRows: Locator;
+    readonly emptyCartMessage: Locator;
 
     constructor(page: Page) {
         this.page = page;
         this.searchInput = page.locator('#small-searchterms');
         this.searchButton = page.getByRole('button', { name: 'Search' });
         this.cartTableRows = page.locator('table.cart').locator('tr.cart-item-row');
+        this.emptyCartMessage = page.locator('.order-summary-content');
     }
 
     // Clear the items from cart
@@ -30,5 +32,6 @@ export class ShoppingPage {
             await this.page.getByRole('button', { name: 'Update shopping cart' }).click();
         }
     }
+
 
 }

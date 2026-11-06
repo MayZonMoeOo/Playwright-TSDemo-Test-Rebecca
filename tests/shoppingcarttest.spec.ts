@@ -14,7 +14,7 @@ test.beforeEach(async ({page}) => {
     await loginPage.loginUser(VALID_USER.email,VALID_USER.password);
 });
 
-test.only("Shopping Cart Total",async ({page}) => {
+test("Shopping Cart Total",async ({page}) => {
 
         const homePage = new HomePage(page);
         const wishlistPage = new WishlistPage(page);
