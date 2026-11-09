@@ -19,18 +19,15 @@ export class ProductsPage {
         // Item 1: Build your own computer
         await this.page.getByRole('link', { name: 'Build your own computer', exact: true }).click();
         await this.page.getByRole('radio', { name: 'GB [+100.00]' }).check();
-        await this.page.locator('#add-to-cart-button-16').click();
-        await expect(this.page.locator('#bar-notification')).toBeVisible();
-        
-        await this.page.getByRole('link', { name: 'Desktops' }).first().click();
-        
+        await this.page.locator('#add-to-cart-button-16').click();      
+                
         // Item 2: Build your own cheap computer
+        await this.page.getByRole('link', { name: 'Desktops' }).first().click();
         await this.page.getByRole('link', { name: 'Build your own cheap computer', exact: true }).click();
         await this.page.getByRole('radio', { name: 'Fast [+100.00]' }).check();
         await this.page.getByRole('radio', { name: 'GB [+60.00]' }).check();
         await this.page.getByRole('checkbox', { name: 'Office Suite [+100.00]' }).check();
         await this.page.locator('#add-to-cart-button-72').click();
-        await expect(this.page.locator('#bar-notification')).toBeVisible();
     }
 
     async addNotebooksItem() {
@@ -39,7 +36,6 @@ export class ProductsPage {
         await this.page.getByRole('link', { name: 'Notebooks' }).first().click(); 
         await this.page.getByRole('link', { name: '14.1-inch Laptop', exact: true }).click();
         await this.page.locator('#add-to-cart-button-31').click();
-        await expect(this.page.locator('#bar-notification')).toBeVisible();
     }
 
     async addJewelryToWishlist() {
@@ -48,6 +44,10 @@ export class ProductsPage {
         await this.page.locator('#products-pagesize').selectOption('4');
         await this.page.getByRole('link', { name: 'Black & White Diamond Heart', exact: true }).click();
         await this.page.getByRole('button', { name: 'Add to wishlist' }).click();
+    }
+
+    // --- EXPECTATIONS ---
+    async verifyNotificationVisible() {
         await expect(this.page.locator('#bar-notification')).toBeVisible();
     }
 }

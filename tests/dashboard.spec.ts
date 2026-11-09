@@ -24,31 +24,40 @@ test("Search Products and Add to Wishlist", async ({ page }) => {
     await wishlistPage.clearWishlist();
 });
 
-test("Dashboard Test", async ({ page }) => {
+test("Dashboard Test with Encapsulated POM Actions & Expects", async ({ page }) => {
     const homePage = new HomePage(page);
     const wishlistPage = new WishlistPage(page);
     const cartlistPage = new ShoppingPage(page);
     const dashboardPage = new DashboardPage(page);
     
-    // Clear the items from Shopping before add shopping item
+    // Clear items before test
     await cartlistPage.clearcartlist();
     await wishlistPage.clearWishlist();
 
-    // 1. Navigate and verify products & prices
+    // Navigate and Verify Prices
     await dashboardPage.navigateToDesktops();
     await dashboardPage.verifyProductListPrices();
 
-    // 2. Filter testing
-    await dashboardPage.applyPriceFilterAndVerify();
-    await dashboardPage.removeFilterAndVerify();
+    // Apply Filter and Verify
+    await dashboardPage.applyPriceFilter();
+    await dashboardPage.verifyFilteredPrice();
 
-    // 3. Add Jewelry to Wishlist
+    // Remove Filter and Verify
+    await dashboardPage.removeFilter();
+    await dashboardPage.verifyRemovedFilterPrices();
+
+    // Add Jewelry to Wishlist and Verify
     await dashboardPage.addJewelryToWishlist();
+    await dashboardPage.verifyWishlistNotificationAndQty();
+    await dashboardPage.goToWishlistPage();
 
-    // 4. Add Computers & Notebooks to Cart
+    // Add Computers/Notebooks to Cart and Verify
     await dashboardPage.addComputersAndNotebooksToCart();
+    await dashboardPage.verifyCartNotificationAndQty();
 
-    // 5. Logout
-    await homePage.clickLogout(); 
-    //await page.getByRole('link', { name: 'Log out' }).click();
+    //Go to Whislist and Shopping Cart
+    await dashboardPage.goToCartAndWishlistPages();
+
+    // Logout
+    await homePage.clickLogout();
 });

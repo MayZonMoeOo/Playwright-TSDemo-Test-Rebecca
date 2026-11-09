@@ -21,34 +21,42 @@ test("Empty Shopping Cart Test", async ({ page }) => {
     const productsPage = new ProductsPage(page);
     const homePage = new HomePage(page);
 
-    // 1. Clear items before adding new ones
+    // Clear items before adding new ones
     await cartlistPage.clearcartlist();
     await wishlistPage.clearWishlist();
 
-    // 2. Add products using ProductsPage
+    // Action & Expect:addComputersAndDesktopsItems
     await productsPage.addComputersAndDesktopsItems();
-    await productsPage.addNotebooksItem();
-    await productsPage.addJewelryToWishlist();
+    await productsPage.verifyNotificationVisible();
 
-    // 3. Navigate to Shopping Cart
+    // Action & Expect:addNotebooksItem
+    await productsPage.addNotebooksItem();
+    await productsPage.verifyNotificationVisible();
+    
+    // Action & Expect:addJewelryToWishlist
+    await productsPage.addJewelryToWishlist();
+    await productsPage.verifyNotificationVisible();
+
+    // Navigate to Shopping Cart
     await cartlistPage.navigateToShoppingCart();
 
-    // 4. Verify buttons, prices, and totals
+    // Verify buttons, prices, and totals
     await cartlistPage.verifyCartButtonsVisible();
     await cartlistPage.verifyItemPrices();
     await cartlistPage.verifyOrderTotals();
     await cartlistPage.verifyCartQty('(3)');
 
-    // 5. Delete items one by one and verify quantity changes
+    // Delete items one by one and verify quantity changes
     await cartlistPage.removeFirstItemAndVerifyQty('Build your own computer', '(2)');
     await cartlistPage.removeFirstItemAndVerifyQty('Build your own cheap computer', '(1)');
     
-    // 6. Delete the last item and verify empty cart state
+    // Delete the last item and verify empty cart state
     await cartlistPage.page.locator('tr').filter({ hasText: '14.1-inch Laptop' }).locator('input[name="removefromcart"]').check();
     await cartlistPage.updateCartButton.click();
+
     await cartlistPage.verifyEmptyCart();
 
-    // 7. Log out
+    // Log out
     await homePage.clickLogout(); 
     //await page.getByRole('link', { name: 'Log out' }).click();
 });
