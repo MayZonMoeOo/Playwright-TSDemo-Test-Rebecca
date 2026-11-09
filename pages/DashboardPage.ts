@@ -1,65 +1,90 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
 import { WishlistPage } from './WhislistPage';
 
 export class DashboardPage {
     readonly page: Page;
-    readonly booksLink: Locator;
-    readonly computerLink: Locator;
-    readonly electronicsLink: Locator;
-    readonly apparelshoesLink: Locator;
-    readonly digitaldownloadLink: Locator;
-    readonly jewelryLink: Locator;
-    readonly giftcardLink: Locator;
-    readonly wishlistTableRows: Locator;
-    readonly cartTableRows: Locator;
+    readonly productGrid: Locator;
+    readonly barNotification: Locator;
+    readonly wishlistQty: Locator;
+    readonly cartQty: Locator;
 
     constructor(page: Page) {
         this.page = page;
-        this.booksLink = page.locator('div.top-menu').locator('a.top-menu-triangle');
-        this.computerLink = page.locator('div.top-menu').locator('a.top-menu-triangle');
-        this.electronicsLink = page.locator('div.top-menu').locator('a.top-menu-triangle');
-        this.apparelshoesLink = page.locator('div.top-menu').locator('a.top-menu-triangle');
-        this.digitaldownloadLink = page.locator('div.top-menu').locator('a.top-menu-triangle');
-        this.jewelryLink = page.locator('div.top-menu').locator('a.top-menu-triangle');
-        this.giftcardLink = page.locator('div.top-menu').locator('a.top-menu-triangle');
-        this.wishlistTableRows = page.locator('table.cart').locator('tr.cart-item-row');
-        this.cartTableRows = page.locator('table.cart').locator('tr.cart-item-row');
+        this.page = page;
+        this.productGrid = page.locator('.product-grid');
+        this.barNotification = page.locator('div.bar-notification p.content');
+        this.wishlistQty = page.locator('span.wishlist-qty');
+        this.cartQty = page.locator('span.cart-qty');
     }
-     // Clear the items from Wishlist
-    async clearWishlist() {
-        // Go to wishlist
-        const homePage = new HomePage(this.page);
-        await homePage.clickWishlist();
-
-        // Check the items and clear
-        const wishlistitems = await this.wishlistTableRows.all();
-
-        if (wishlistitems.length > 0) {
-            for (const item of wishlistitems) {
-                await item.locator('td.remove-from-cart input[type="checkbox"]').click();
-            }
-            await this.page.getByRole('button', { name: 'Update wishlist' }).click();
-        }
+    async navigateToDesktops() {
+        await this.page.getByRole('link', { name: 'Computers' }).first().hover();
+        await this.page.getByRole('link', { name: 'Desktops' }).click();
+        await this.page.locator('#products-pagesize').selectOption('4');
     }
 
-    async clearShopping() {
-        // Go to shoplist
-        const homePage = new HomePage(this.page);
-        await homePage.clickShopping;
-
-        // Check the items and clear
-        const cartitems = await this.cartTableRows.all();
-
-        if (cartitems.length > 0) {
-            for (const item of cartitems) {
-                await item.locator('td.remove-from-cart input[type="checkbox"]').click();
-            }
-            await this.page.getByRole('button', { name: 'Update shopping cart' }).click();
-        }
+    async verifyProductListPrices() {
+        const productDetailsText = await this.productGrid.textContent();
+        await expect(productDetailsText).toContain('Build your own cheap computer');
+        await expect(productDetailsText).toContain('800.00');
+        await expect(productDetailsText).toContain('Build your own computer');
+        await expect(productDetailsText).toContain('1200.00');
+        await expect(productDetailsText).toContain('Build your own expensive computer');
+        await expect(productDetailsText).toContain('1800.00');
+        await expect(productDetailsText).toContain('Desktop PC with CDRW');
+        await expect(productDetailsText).toContain('500.00');
     }
 
-    async goto() {
-        await this.page.goto('https://demowebshop.tricentis.com/');
+    async applyPriceFilterAndVerify() {
+        await this.page.getByRole('link', { name: '- 1200.00' }).click();
+        await expect(this.page.locator('.product-item').filter({ hasText: 'Build your own computer' }).locator('div.prices')).toContainText('1200.00');
+    }
+
+    async removeFilterAndVerify() {
+        await this.page.getByRole('link', { name: 'Remove Filter' }).click();
+        await expect(this.page.locator('div.prices').nth(0)).toContainText('800.00');
+        await expect(this.page.locator('div.prices').nth(1)).toContainText('1200.00');
+        await expect(this.page.locator('div.prices').nth(2)).toContainText('1800.00');
+        await expect(this.page.locator('div.prices').nth(3)).toContainText('500.00');
+    }
+
+    async addJewelryToWishlist() {
+        await this.page.getByRole('link', { name: 'Jewelry' }).first().click();
+        await this.page.locator('#products-pagesize').selectOption('4');
+        await this.page.locator('h2.product-title a', { hasText: 'Black & White Diamond Heart' }).click();
+        await this.page.getByRole('button', { name: 'Add to wishlist' }).click();
+
+        await expect(this.barNotification).toContainText('The product has been added to your wishlist');
+        await expect(this.wishlistQty).toHaveText('(1)');
+        await this.page.getByRole('link', { name: 'Wishlist' }).first().click();
+    }
+
+    async addComputersAndNotebooksToCart() {
+        await this.page.getByRole('link', { name: 'Computers' }).first().hover();
+        await this.page.getByRole('link', { name: 'Desktops' }).first().click();
+        
+        // 1. Build your own computer
+        await this.page.getByRole('link', { name: 'Build your own computer', exact: true }).click();
+        await this.page.getByRole('radio', { name: 'GB [+100.00]' }).check();
+        await this.page.locator('#add-to-cart-button-16').click();
+        
+        // 2. Build your own cheap computer
+        await this.page.getByRole('link', { name: 'Desktops' }).first().click();
+        await this.page.getByRole('link', { name: 'Build your own cheap computer', exact: true }).click();
+        await this.page.getByRole('radio', { name: 'Fast [+100.00]' }).check();
+        await this.page.getByRole('radio', { name: 'GB [+60.00]' }).check();
+        await this.page.getByRole('checkbox', { name: 'Office Suite [+100.00]' }).check();
+        await this.page.locator('#add-to-cart-button-72').click();
+        
+        // 3. 14.1-inch Laptop
+        await this.page.getByRole('link', { name: 'Notebooks' }).first().click();
+        await this.page.getByRole('link', { name: '14.1-inch Laptop', exact: true }).click();
+        await this.page.locator('#add-to-cart-button-31').click();
+
+        await expect(this.barNotification).toContainText('The product has been added to your shopping cart');
+        await expect(this.cartQty).toHaveText('(3)');
+
+        await this.page.getByRole('link', { name: 'Shopping cart' }).first().click();
+        await this.page.getByRole('link', { name: 'Wishlist' }).first().click();
     }
 }
