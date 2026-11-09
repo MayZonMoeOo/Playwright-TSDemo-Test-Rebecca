@@ -101,7 +101,7 @@ This project includes six automated test scenarios—implemented using Playwrigh
 
 ---
 
-### Scenario 4: Invalid Login Test
+### Scenario 3: Invalid Login Test
 * **File:** `tests/logintest.spec.ts`
 * **Test Name:** `Invalid Login Test`
 * **Flow:** Shows error messages when logging in with incorrect credentials.
