@@ -16,12 +16,21 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("Search Products and Add to Wishlist", async ({ page }) => {
+    //await page.goto("https://demowebshop.tricentis.com/");
+    //await page.pause();
     const wishlistPage = new WishlistPage(page);
     const cartlistPage = new ShoppingPage(page);
+    const dashboardPage = new DashboardPage(page);
 
     // Clear the items from Shopping before add shopping item
     await cartlistPage.clearcartlist();
     await wishlistPage.clearWishlist();
+
+    //Search 'Com' in search store 
+    await dashboardPage.searchItemsStore();
+
+    //Verify items in searchStore 
+    await dashboardPage.verifySearchStore();
 });
 
 test("Dashboard Test with Encapsulated POM Actions & Expects", async ({ page }) => {
@@ -34,30 +43,64 @@ test("Dashboard Test with Encapsulated POM Actions & Expects", async ({ page }) 
     await cartlistPage.clearcartlist();
     await wishlistPage.clearWishlist();
 
-    // Navigate and Verify Prices
+    // Navigate 
     await dashboardPage.navigateToDesktops();
+
+    // Verify Category Heading
+    await dashboardPage.verifyCategoryHeading();
+
+    // Verify Product Prices
     await dashboardPage.verifyProductListPrices();
 
-    // Apply Filter and Verify
+    // Verify Product Count Before Filter
+    await dashboardPage.verifyProductCountBeforeFilter();
+
+    // Apply Price Filter
     await dashboardPage.applyPriceFilter();
+
+    // Verify Product Count After Filter
+    await dashboardPage.verifyProductCountAfterFilter();
+
+    // Verify Filtered Product Price
     await dashboardPage.verifyFilteredPrice();
 
-    // Remove Filter and Verify
+    // Remove Price Filter
     await dashboardPage.removeFilter();
+
+    // Verify Product Count After Removing Filter
+    await dashboardPage.verifyProductCountAfterRemovingFilter();
+
+    // Verify Product Prices
     await dashboardPage.verifyRemovedFilterPrices();
 
-    // Add Jewelry to Wishlist and Verify
+    // Add First Product to Wishlist (Jewelry)
     await dashboardPage.addJewelryToWishlist();
-    await dashboardPage.verifyWishlistNotificationAndQty();
+    await dashboardPage.verifyWishlistNotificationAndQty(1);
+
+    // 5. Add Second Product to Wishlist (Apparel)
+    await dashboardPage.addApparelToWishlist();
+    await dashboardPage.verifyWishlistNotificationAndQty(2);
+
+    // Verify Wishlist Page
     await dashboardPage.goToWishlistPage();
 
-    // Add Computers/Notebooks to Cart and Verify
+    // Add Three Products to Shopping Cart
+    // Notification and quantity are verified after each addition
     await dashboardPage.addComputersAndNotebooksToCart();
-    await dashboardPage.verifyCartNotificationAndQty();
 
-    //Go to Whislist and Shopping Cart
+    // 8. Navigate to Shopping Cart and Wishlist
     await dashboardPage.goToCartAndWishlistPages();
 
     // Logout
-    await homePage.clickLogout();
+    //await homePage.clickLogout();
+});
+
+test.afterEach(async ({ page }) => {
+    const homePage = new HomePage(page);
+    
+    // Logging out or clearing the session after every test
+    const logoutBtn = page.getByRole('link', { name: 'Log out' });
+    if (await logoutBtn.isVisible()) {
+        await logoutBtn.click();
+    }
 });

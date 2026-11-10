@@ -36,16 +36,42 @@ test('Register New User',async ({page}) => {
 });
 
 test('Register Existing User',async ({page}) => {
+    
     const homePage = new HomePage(page);
     const registerPage = new RegisterPage(page);
 
-    await homePage.clickRegister();
-    // Fill the register form with existing user information
-    await registerPage.registerUser(VALID_USER.gender, VALID_USER.firstName, VALID_USER.lastName, VALID_USER.email, VALID_USER.password);
+    const uniqueEmail = `duplicate_${Date.now()}@yopmail.com`;
 
-    // Check the error messgae is visible and show as 'The specified email already exists' or not
-    await expect(registerPage.errorMessage).toBeVisible();
-    await expect(registerPage.errorMessage).toHaveText("The specified email already exists")
+    // First registration
+    await homePage.clickRegister();
+
+    await registerPage.registerUser(
+        VALID_USER.gender,
+        VALID_USER.firstName,
+        VALID_USER.lastName,
+        uniqueEmail,
+        VALID_USER.password
+    );
+
+    await expect(registerPage.resultMessage).toHaveText('Your registration completed');
+
+    await registerPage.clickContinue();
+
+    await homePage.clickLogout();
+
+    // Register again using the same email
+    await homePage.clickRegister();
+
+    await registerPage.registerUser(
+        VALID_USER.gender,
+        VALID_USER.firstName,
+        VALID_USER.lastName,
+        uniqueEmail,
+        VALID_USER.password
+    );
+
+    await expect(registerPage.errorMessage).toContainText('The specified email already exists');
 
 } );
+
 

@@ -7,6 +7,8 @@ export class DashboardPage {
     readonly barNotification: Locator;
     readonly wishlistQty: Locator;
     readonly cartQty: Locator;
+    readonly searchStore: Locator;
+    readonly productName: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -14,9 +16,19 @@ export class DashboardPage {
         this.barNotification = page.locator('div.bar-notification p.content');
         this.wishlistQty = page.locator('span.wishlist-qty');
         this.cartQty = page.locator('span.cart-qty');
+        this.searchStore = page.locator('#small-searchterms');
+        this.productName = page.locator('div.product-name h1');
     }
 
     // ACTIONS
+
+    async searchItemsStore(){
+    await this.page.locator('#small-searchterms').click();
+    await this.page.locator('#small-searchterms').fill('Com');
+    await this.page.getByText('Computing and Internet', { exact: true }).click();
+    await this.page.getByText('Home / Books / Computing and').click();
+    await this.page.locator('.product-name').click();
+    }
 
     async navigateToDesktops() {
         await this.page.getByRole('link', { name: 'Computers' }).first().hover();
@@ -43,15 +55,26 @@ export class DashboardPage {
         await this.page.getByRole('link', { name: 'Wishlist' }).first().click();
     }
 
+    async addApparelToWishlist() {
+        await this.page.getByRole('link', { name: 'Apparel & Shoes' }).first().click();
+        await this.page.locator('#products-pagesize').selectOption('4');
+        await this.page.locator('h2.product-title a', { hasText: 'Blue and green Sneaker' }).click();
+        await this.page.getByRole('button', { name: 'Add to wishlist' }).click();
+    }
+
     async addComputersAndNotebooksToCart() {
+        
         await this.page.getByRole('link', { name: 'Computers' }).first().hover();
         await this.page.getByRole('link', { name: 'Desktops' }).first().click();
-        
+
         // 1. Build your own computer
         await this.page.getByRole('link', { name: 'Build your own computer', exact: true }).click();
         await this.page.getByRole('radio', { name: 'GB [+100.00]' }).check();
         await this.page.locator('#add-to-cart-button-16').click();
-        
+
+        // Verify first product added
+        await this.verifyCartNotificationAndQty(1);
+
         // 2. Build your own cheap computer
         await this.page.getByRole('link', { name: 'Desktops' }).first().click();
         await this.page.getByRole('link', { name: 'Build your own cheap computer', exact: true }).click();
@@ -59,21 +82,55 @@ export class DashboardPage {
         await this.page.getByRole('radio', { name: 'GB [+60.00]' }).check();
         await this.page.getByRole('checkbox', { name: 'Office Suite [+100.00]' }).check();
         await this.page.locator('#add-to-cart-button-72').click();
-        
+
+        // Verify second product added
+        await this.verifyCartNotificationAndQty(2);
+
         // 3. 14.1-inch Laptop
         await this.page.getByRole('link', { name: 'Notebooks' }).first().click();
         await this.page.getByRole('link', { name: '14.1-inch Laptop', exact: true }).click();
         await this.page.locator('#add-to-cart-button-31').click();
 
-        //await this.page.getByRole('link', { name: 'Shopping cart' }).first().click();
-        //await this.page.getByRole('link', { name: 'Wishlist' }).first().click();
+        // Verify third product added
+        await this.verifyCartNotificationAndQty(3);
     }
+
     async goToCartAndWishlistPages() {
         await this.page.getByRole('link', { name: 'Shopping cart' }).first().click();
         await this.page.getByRole('link', { name: 'Wishlist' }).first().click();
     }
 
     // EXPECTATIONS
+
+    async verifySearchStore(){
+        await expect(this.page.locator('.product-name h1')).toHaveText('Computing and Internet');
+    }
+
+    async verifyCategoryHeading() {
+        await expect(
+            this.page.getByRole('heading', {
+                name: 'Desktops'
+            })
+        ).toBeVisible();
+    }
+
+    async verifyProductCountBeforeFilter() {
+        await expect(
+            this.page.locator('.product-item')
+        ).toHaveCount(4);
+    }
+
+    async verifyProductCountAfterFilter() {
+        await expect(
+            this.page.locator('.product-item')
+        ).toHaveCount(1);
+    }
+
+    async verifyProductCountAfterRemovingFilter() {
+        await expect(
+            this.page.locator('.product-item')
+        ).toHaveCount(4);
+    }
 
     async verifyProductListPrices() {
         const productDetailsText = await this.productGrid.textContent();
@@ -98,13 +155,15 @@ export class DashboardPage {
         await expect(this.page.locator('div.prices').nth(3)).toContainText('500.00');
     }
 
-    async verifyWishlistNotificationAndQty() {
+    async verifyWishlistNotificationAndQty(expectedQty: number) {
         await expect(this.barNotification).toContainText('The product has been added to your wishlist');
-        await expect(this.wishlistQty).toHaveText('(1)');
+        //await expect(this.wishlistQty).toHaveText('(1)');
+        await expect(this.wishlistQty).toHaveText(`(${expectedQty})`);
+
     }
 
-    async verifyCartNotificationAndQty() {
+    async verifyCartNotificationAndQty(expectedQty: number) {
         await expect(this.barNotification).toContainText('The product has been added to your shopping cart');
-        await expect(this.cartQty).toHaveText('(3)');
+        await expect(this.cartQty).toHaveText(`(${expectedQty})`);
     }
 }
