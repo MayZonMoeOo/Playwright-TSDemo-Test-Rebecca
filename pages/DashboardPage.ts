@@ -47,9 +47,8 @@ export class DashboardPage {
     async addJewelryToWishlist() {
         await this.page.getByRole('link', { name: 'Jewelry' }).first().click();
         await this.page.locator('#products-pagesize').selectOption('4');
-        await this.page.locator('h2.product-title a', { hasText: 'Black & White Diamond Heart' }).click();
+        await this.page.getByRole('link', { name: 'Black & White Diamond Heart', exact: true }).click()
         await this.page.getByRole('button', { name: 'Add to wishlist' }).click();
-        //await this.page.getByRole('link', { name: 'Wishlist' }).first().click();
     }
     async goToWishlistPage() {
         await this.page.getByRole('link', { name: 'Wishlist' }).first().click();
@@ -58,7 +57,7 @@ export class DashboardPage {
     async addApparelToWishlist() {
         await this.page.getByRole('link', { name: 'Apparel & Shoes' }).first().click();
         await this.page.locator('#products-pagesize').selectOption('4');
-        await this.page.locator('h2.product-title a', { hasText: 'Blue and green Sneaker' }).click();
+        await this.page.getByRole('link', { name: 'Blue and green Sneaker', exact: true }).click();
         await this.page.getByRole('button', { name: 'Add to wishlist' }).click();
     }
 
@@ -80,6 +79,7 @@ export class DashboardPage {
         await this.page.getByRole('link', { name: 'Build your own cheap computer', exact: true }).click();
         await this.page.getByRole('radio', { name: 'Fast [+100.00]' }).check();
         await this.page.getByRole('radio', { name: 'GB [+60.00]' }).check();
+        //await this.page.getByRole('radio', { name: '8GB [+60.00]' }).check();
         await this.page.getByRole('checkbox', { name: 'Office Suite [+100.00]' }).check();
         await this.page.locator('#add-to-cart-button-72').click();
 
@@ -107,29 +107,19 @@ export class DashboardPage {
     }
 
     async verifyCategoryHeading() {
-        await expect(
-            this.page.getByRole('heading', {
-                name: 'Desktops'
-            })
-        ).toBeVisible();
+        await expect(this.page.getByRole('heading', {name: 'Desktops'})).toBeVisible();
     }
 
     async verifyProductCountBeforeFilter() {
-        await expect(
-            this.page.locator('.product-item')
-        ).toHaveCount(4);
+        await expect(this.page.locator('.product-item')).toHaveCount(4);
     }
 
     async verifyProductCountAfterFilter() {
-        await expect(
-            this.page.locator('.product-item')
-        ).toHaveCount(1);
+        await expect(this.page.locator('.product-item')).toHaveCount(1);
     }
 
     async verifyProductCountAfterRemovingFilter() {
-        await expect(
-            this.page.locator('.product-item')
-        ).toHaveCount(4);
+        await expect(this.page.locator('.product-item')).toHaveCount(4);
     }
 
     async verifyProductListPrices() {

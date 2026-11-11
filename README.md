@@ -62,6 +62,7 @@ This project includes six automated test scenarios—implemented using Playwrigh
 
 ---
 
+
 ### Scenario 1: Register New User
 * **File:** `tests/registertest.spec.ts`
 * **Test Name:** `Register New User`
@@ -76,6 +77,7 @@ This project includes six automated test scenarios—implemented using Playwrigh
 
 ---
 
+
 ### Register Existing User
 * **File:** `tests/registertest.spec.ts`
 * **Test Name:** `Register Existing User`
@@ -87,6 +89,7 @@ This project includes six automated test scenarios—implemented using Playwrigh
   * Shows the error message: `"The specified email already exists"`.
 
 ---
+
 
 ### Scenario 2: Login Test
 * **File:** `tests/logintest.spec.ts`
@@ -101,6 +104,7 @@ This project includes six automated test scenarios—implemented using Playwrigh
 
 ---
 
+
 ### Scenario 3: Invalid Login Test
 * **File:** `tests/logintest.spec.ts`
 * **Test Name:** `Invalid Login Test`
@@ -113,6 +117,7 @@ This project includes six automated test scenarios—implemented using Playwrigh
   * For unregistered email, expects the error message: `Login was unsuccessful. Please correct the errors and try again.` and `No customer account found`.
 
 ---
+
 
 ### Scenario 4: Dashboard Test
 * **File:** `tests/dashboard.spec.ts`
@@ -129,6 +134,7 @@ This project includes six automated test scenarios—implemented using Playwrigh
   * Expects a notification text: The product has been added to your shopping cart after adding each shopping cart item.
 
   ---
+
 
   ### Scenario 5: Shopping Cart Test
 * **File:** `tests/shoppingcarttest.spec.ts`
@@ -147,8 +153,9 @@ This project includes six automated test scenarios—implemented using Playwrigh
 
   ---
 
+
   ### Scenario 6: Empty Shopping Cart Test
-* **File:** `tests/emptyshoppingcarttest.spec.ts`
+* **File:** `tests/emptyshoppingcart.spec.ts`
 * **Test Name:** `Empty Shopping Cart Test`
 * **Flow:** Tests deleting items from the shopping cart one by one, verifying that the item count decreases, confirming that the shopping cart becomes empty, and closing the browser.
 * **Steps:**
@@ -161,3 +168,4 @@ This project includes six automated test scenarios—implemented using Playwrigh
   * uccessfully closes the browser session.
 
   ---
+

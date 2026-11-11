@@ -22,7 +22,7 @@ test.beforeEach(async ({ page }) => {
     );
 });
 
-test.only('Shopping Cart Total and Verify Notifications', async ({ page }) => {
+test('Shopping Cart Total and Verify Notifications', async ({ page }) => {
 
     const wishlistPage = new WishlistPage(page);
     const cartlistPage = new ShoppingPage(page);

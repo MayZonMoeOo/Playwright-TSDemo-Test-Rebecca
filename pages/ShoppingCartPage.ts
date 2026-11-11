@@ -39,13 +39,12 @@ export class ShoppingPage {
         this.emptyCartMessage = page.locator('.order-summary-content');
 
         // Mini Cart
-        this.miniCartTrigger = page.locator('div.header-links').locator('a.ico-cart').first();
+        this.miniCartTrigger = page.locator('div.header-links a.ico-cart').first();
         this.miniCart = page.locator('.flyout-cart');
         this.miniCartCount = page.locator('.mini-shopping-cart .count');
         this.miniCartItems = page.locator('.mini-shopping-cart .items .item');
         this.miniCartSubtotal = page.locator('.mini-shopping-cart .totals');
         this.goToCartLink = page.locator('.mini-shopping-cart input.cart-button');
-        //this.goToCartLink = this.miniCart.getByRole('link', {name: 'Go to cart'});
 
         // Sub-Total Row
         //this.subtotalRow = this.orderSummary.locator('tr:has(td.cart-total-left:text-is("Sub-Total:"))');
@@ -70,22 +69,16 @@ export class ShoppingPage {
     // Clear all items from shopping cart
     async clearcartlist() {
         const homePage = new HomePage(this.page);
-
         await homePage.clickShopping();
 
-        const rowCount = await this.cartTableRows.count();
+        // Check the items and clear
+        const cartlistitems = await this.cartTableRows.all();
 
-        if (rowCount > 0) {
-            for (let i = 0; i < rowCount; i++) {
-                await this.cartTableRows
-                    .nth(i)
-                    .locator(
-                        'td.remove-from-cart input[type="checkbox"]'
-                    )
-                    .check();
+        if (cartlistitems.length > 0) {
+            for (const item of cartlistitems) {
+                await item.locator('td.remove-from-cart input[type="checkbox"]').click();
             }
-
-            await this.updateCartButton.click();
+            await this.page.getByRole('button', { name: 'Update shopping cart' }).click();
         }
     }
 
@@ -97,6 +90,38 @@ export class ShoppingPage {
             this.page.locator('.page-title')).toContainText('Shopping cart');
     }
 
+    // Get current cart row count
+    async getCartRowCount(): Promise<number> {
+        return await this.cartTableRows.count();
+    }
+
+    async removeProductAndVerifyRows(productName: string,expectedRowCount: number) {
+        const currentRowCount = await this.getCartRowCount();
+
+        expect(currentRowCount).toBeGreaterThan(0);
+
+        await this.cartTableRows.filter({ hasText: productName }).locator('input[name="removefromcart"]').check();
+
+        await this.updateCartButton.click();
+
+        await expect(this.cartTableRows)
+            .toHaveCount(expectedRowCount);
+    }
+
+    // Remove all products one by one and verify
+    async removeAllProductsAndVerify() {
+        const initialRowCount = await this.getCartRowCount();
+
+        expect(initialRowCount).toBeGreaterThan(0);
+
+        for (let i = initialRowCount; i > 0; i--) {
+            const productName = await this.cartTableRows.first().locator('.product-name').innerText();
+
+            await this.removeProductAndVerifyRows(productName,i - 1);
+        }
+
+        await this.verifyEmptyCart();
+    }
     // Verify Mini Cart Hover
     async verifyMiniCart() {
         // Hover Shopping Cart
