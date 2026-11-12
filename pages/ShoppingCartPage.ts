@@ -31,9 +31,9 @@ export class ShoppingPage {
         this.searchInput = page.locator('#small-searchterms');
         this.searchButton = page.getByRole('button', { name: 'Search' });
         this.cartTableRows = page.locator('table.cart tr.cart-item-row');
-        this.updateCartButton = page.getByRole('button', {name: 'Update shopping cart'});
-        this.continueShoppingButton = page.getByRole('button', {name: 'Continue shopping'});
-        this.estimateShippingButton = page.getByRole('button', {name: 'Estimate shipping'});
+        this.updateCartButton = page.getByRole('button', { name: 'Update shopping cart' });
+        this.continueShoppingButton = page.getByRole('button', { name: 'Continue shopping' });
+        this.estimateShippingButton = page.getByRole('button', { name: 'Estimate shipping' });
         this.orderSummary = page.locator('table.cart-total');
         this.cartQty = page.locator('span.cart-qty');
         this.emptyCartMessage = page.locator('.order-summary-content');
@@ -76,7 +76,7 @@ export class ShoppingPage {
 
         if (cartlistitems.length > 0) {
             for (const item of cartlistitems) {
-                await item.locator('td.remove-from-cart input[type="checkbox"]').click();
+                await item.locator('td.remove-from-cart input[type="checkbox"]').check();
             }
             await this.page.getByRole('button', { name: 'Update shopping cart' }).click();
         }
@@ -84,10 +84,9 @@ export class ShoppingPage {
 
     // Navigate to shopping cart
     async navigateToShoppingCart() {
-        await this.page.getByRole('link', {name: 'Shopping cart'}).first().click();
+        await this.page.getByRole('link', { name: 'Shopping cart' }).first().click();
 
-        await expect(
-            this.page.locator('.page-title')).toContainText('Shopping cart');
+        await expect(this.page.locator('.page-title')).toContainText('Shopping cart');
     }
 
     // Get current cart row count
@@ -95,7 +94,7 @@ export class ShoppingPage {
         return await this.cartTableRows.count();
     }
 
-    async removeProductAndVerifyRows(productName: string,expectedRowCount: number) {
+    async removeProductAndVerifyRows(productName: string, expectedRowCount: number) {
         const currentRowCount = await this.getCartRowCount();
 
         expect(currentRowCount).toBeGreaterThan(0);
@@ -104,8 +103,7 @@ export class ShoppingPage {
 
         await this.updateCartButton.click();
 
-        await expect(this.cartTableRows)
-            .toHaveCount(expectedRowCount);
+        await expect(this.cartTableRows).toHaveCount(expectedRowCount);
     }
 
     // Remove all products one by one and verify
@@ -117,7 +115,7 @@ export class ShoppingPage {
         for (let i = initialRowCount; i > 0; i--) {
             const productName = await this.cartTableRows.first().locator('.product-name').innerText();
 
-            await this.removeProductAndVerifyRows(productName,i - 1);
+            await this.removeProductAndVerifyRows(productName, i - 1);
         }
 
         await this.verifyEmptyCart();
@@ -125,32 +123,32 @@ export class ShoppingPage {
     // Verify Mini Cart Hover
     async verifyMiniCart() {
         // Hover Shopping Cart
-    await this.miniCartTrigger.hover();
+        await this.miniCartTrigger.hover();
 
-    // Verify Mini Cart Visible
-    await expect(this.miniCart).toBeVisible();
+        // Verify Mini Cart Visible
+        await expect(this.miniCart).toBeVisible();
 
-    // Verify Cart Item Count
-    await expect(this.miniCartCount).toContainText('There are 3 item(s) in your cart');
+        // Verify Cart Item Count
+        await expect(this.miniCartCount).toContainText(`There are 3 item(s) in your cart`);
 
-    // Verify Mini Cart Products
-    const itemCount = await this.miniCartItems.count();
+        // Verify Mini Cart Products
+        const itemCount = await this.miniCartItems.count();
 
-    expect(itemCount).toBeGreaterThan(0);
+        expect(itemCount).toBeGreaterThan(0);
 
-    for (let i = 0; i < itemCount; i++) {
-        const item = this.miniCartItems.nth(i);
+        for (let i = 0; i < itemCount; i++) {
+            const item = this.miniCartItems.nth(i);
 
-        await expect(item.locator('.product .name')).toBeVisible();
-        await expect(item.locator('.product .price')).toBeVisible();
-        await expect(item.locator('.product .quantity')).toBeVisible();
-    }
+            await expect(item.locator('.product .name')).toBeVisible();
+            await expect(item.locator('.product .price')).toBeVisible();
+            await expect(item.locator('.product .quantity')).toBeVisible();
+        }
 
-    // Verify Subtotal
-    await expect(this.miniCartSubtotal).toBeVisible();
+        // Verify Subtotal
+        await expect(this.miniCartSubtotal).toBeVisible();
 
-    // Verify Go To Cart Button
-    await expect(this.goToCartLink).toBeVisible();
+        // Verify Go To Cart Button
+        await expect(this.goToCartLink).toBeVisible();
     }
 
     // Click Go To Cart from Mini Cart
@@ -176,6 +174,17 @@ export class ShoppingPage {
         return expectedTotalInCents / 100;
     }
 
+    private async getSummaryAmount(label: string): Promise<number> {
+        const row = this.orderSummary.getByText(label, { exact: true }).locator('xpath=ancestor::tr[1]');
+
+        if (await row.count() === 0) {
+            return 0;
+        }
+
+        const amountText = await row.locator('td.cart-total-right').innerText();
+
+        return this.parsePrice(amountText);
+    }
     // Verify all cart item prices dynamically
     async verifyItemPrices() {
         const rowCount = await this.cartTableRows.count();
@@ -195,34 +204,34 @@ export class ShoppingPage {
 
     // Verify Cart Order Totals
     async verifyOrderTotals() {
-        
-    // Calculate total from all cart rows
-    const expectedTotal = await this.calculateCartTotal();
 
-    // Verify Sub-Total Row
-    await expect(this.subtotalRow).toBeVisible();
+        // Calculate total from all cart rows
+        const expectedTotal = await this.calculateCartTotal();
 
-    const subtotalText = await this.subtotalRow.locator('td.cart-total-right').innerText();
+        // Verify Sub-Total Row
+        await expect(this.subtotalRow).toBeVisible();
 
-    const actualSubtotal = this.parsePrice(subtotalText);
+        const subtotalText = await this.subtotalRow.locator('td.cart-total-right').innerText();
 
-    expect(actualSubtotal).toBe(Math.round(expectedTotal * 100));
+        const actualSubtotal = this.parsePrice(subtotalText);
 
-    // Verify Shipping
-    await expect(this.orderSummary).toContainText('Shipping:');
+        expect(actualSubtotal).toBe(Math.round(expectedTotal * 100));
 
-    // Verify Tax
-    await expect(this.orderSummary).toContainText('Tax:');
+        // Verify Shipping
+        await expect(this.orderSummary).toContainText('Shipping:');
 
-    // Verify Final Total Row
-    await expect(this.finalTotalRow).toBeVisible();
+        // Verify Tax
+        await expect(this.orderSummary).toContainText('Tax:');
 
-    const totalText = await this.finalTotalRow.locator('td.cart-total-right').innerText();
+        // Verify Final Total Row
+        await expect(this.finalTotalRow).toBeVisible();
 
-    const actualTotal = this.parsePrice(totalText);
+        const totalText = await this.finalTotalRow.locator('td.cart-total-right').innerText();
 
-    // Compare calculated cart total with displayed Final Total
-    expect(actualTotal).toBe(Math.round(expectedTotal * 100));
+        const actualTotal = this.parsePrice(totalText);
+
+        // Compare calculated cart total with displayed Final Total
+        expect(actualTotal).toBe(Math.round(expectedTotal * 100));
     }
 
     // Verify Cart Buttons
@@ -247,7 +256,7 @@ export class ShoppingPage {
     }
 
     // Remove first item and verify quantity
-    async removeFirstItemAndVerifyQty(productName: string,expectedQty: string) {
+    async removeFirstItemAndVerifyQty(productName: string, expectedQty: string) {
         await this.cartTableRows.filter({ hasText: productName }).locator('input[name="removefromcart"]').check();
         await this.updateCartButton.click();
         await this.verifyCartQty(expectedQty);

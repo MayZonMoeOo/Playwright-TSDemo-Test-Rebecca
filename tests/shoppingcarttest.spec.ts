@@ -16,10 +16,7 @@ test.beforeEach(async ({ page }) => {
 
     await homePage.clickLogin();
 
-    await loginPage.loginUser(
-        VALID_USER.email,
-        VALID_USER.password
-    );
+    await loginPage.loginUser(VALID_USER.email,VALID_USER.password);
 });
 
 test('Shopping Cart Total and Verify Notifications', async ({ page }) => {
@@ -61,12 +58,9 @@ test('Shopping Cart Total and Verify Notifications', async ({ page }) => {
     await cartlistPage.verifyCartPage();
 
     // Navigate to Wishlist Page
-    await page.getByRole('link', { name: 'Wishlist' })
-        .first()
-        .click();
+    await page.getByRole('link', { name: 'Wishlist' }).first().click();
 
-    await expect(page.locator('.page-title'))
-        .toContainText('Wishlist');
+    await expect(page.locator('.page-title')).toContainText('Wishlist');
 
     // Navigate Back to Shopping Cart
     await cartlistPage.navigateToShoppingCart();

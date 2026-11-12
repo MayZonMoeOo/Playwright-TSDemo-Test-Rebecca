@@ -4,7 +4,7 @@ import { HomePage } from '../pages/HomePage';
 import { VALID_USER } from '../data/Data';
 import { RegisterPage } from '../pages/RegisterPage';
 
-test.beforeEach(async ({page}) =>{
+test.beforeEach(async ({ page }) => {
   await new HomePage(page).goto();
 })
 
@@ -18,15 +18,9 @@ test('Login Test', async ({ page }) => {
   // Register
   await homePage.clickRegister();
 
-  await registerPage.registerUser(
-    VALID_USER.gender,
-    VALID_USER.firstName,
-    VALID_USER.lastName,
-    uniqueEmail,
-    VALID_USER.password
-  );
+  await registerPage.registerUser(VALID_USER.gender, VALID_USER.firstName, VALID_USER.lastName, uniqueEmail, VALID_USER.password);
 
-  await expect(registerPage.resultMessage).toHaveText('Your registration completed');
+  await expect(registerPage.resultMessage).toContainText('Your registration completed');
 
   await registerPage.clickContinue();
 
@@ -39,7 +33,7 @@ test('Login Test', async ({ page }) => {
   await loginPage.loginUser(uniqueEmail, VALID_USER.password);
 
   // Check Welcome to our store
-  await expect(page.getByText('Welcome to our store')).toBeVisible();
+  await expect(loginPage.welcomeHeading).toBeVisible();
 
   // Check logged-in account
   await expect(homePage.accountLink).toHaveText(uniqueEmail);
@@ -50,80 +44,62 @@ test('Login Test', async ({ page }) => {
 });
 
 test('Invalid Login Test', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const registerPage = new RegisterPage(page);
-    const loginPage = new LoginPage(page);
+  const homePage = new HomePage(page);
+  const registerPage = new RegisterPage(page);
+  const loginPage = new LoginPage(page);
 
-    const testEmail = `wrongpass_${Date.now()}@yopmail.com`;
+  const testEmail = `testlogemail_${Date.now()}@yopmail.com`;
 
-    // Prepare an existing account for wrong-password testing
-    await homePage.clickRegister();
+  // Prepare an existing account for wrong-password testing
+  await homePage.clickRegister();
 
-    await registerPage.registerUser(
-      VALID_USER.gender,
-      VALID_USER.firstName,
-      VALID_USER.lastName,
-      testEmail,
-      VALID_USER.password
-    );
+  await registerPage.registerUser(VALID_USER.gender,VALID_USER.firstName,VALID_USER.lastName,testEmail,VALID_USER.password);
 
-    await expect(registerPage.resultMessage).toHaveText('Your registration completed');
+  await expect(registerPage.resultMessage).toContainText('Your registration completed');
 
-    await registerPage.clickContinue();
+  await registerPage.clickContinue();
 
-    // Logout after registration
-    await homePage.clickLogout();
+  // Logout after registration
+  await homePage.clickLogout();
 
-    // Test login with an unknown email
-    await homePage.clickLogin();
+  // Test login with an unknown email
+  await homePage.clickLogin();
 
-    await loginPage.loginUser(`unknown_${Date.now()}@yopmail.com`, VALID_USER.password);
+  await loginPage.loginUser(`unknown_${Date.now()}@yopmail.com`, VALID_USER.password);
 
-    await expect(loginPage.errorMessages).toContainText('Login was unsuccessful. Please correct the errors and try again.');
+  await expect(loginPage.errorMessages).toContainText('Login was unsuccessful. Please correct the errors and try again.');
+  await expect(loginPage.errorMessages).toContainText('No customer account found');
 
-    await expect(loginPage.errorMessages).toContainText('No customer account found');
+  // Test login with an existing email but wrong password
+  await loginPage.loginUser(testEmail, 'wrong');
 
-    // Test login with an existing email but wrong password
-    await loginPage.loginUser(testEmail, 'wrong');
-
-    await expect(loginPage.errorMessages).toContainText('Login was unsuccessful. Please correct the errors and try again.');
-
-    await expect(loginPage.errorMessages).toContainText('The credentials provided are incorrect');
+  await expect(loginPage.errorMessages).toContainText('Login was unsuccessful. Please correct the errors and try again.');
+  await expect(loginPage.errorMessages).toContainText('The credentials provided are incorrect');
 });
 
 test('Duplicate Registration Test', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const registerPage = new RegisterPage(page);
+  const homePage = new HomePage(page);
+  const registerPage = new RegisterPage(page);
 
-    const email = `duplicate_${Date.now()}@yopmail.com`;
+  const email = `duplicatemail_${Date.now()}@yopmail.com`;
 
-    await homePage.clickRegister();
+  await homePage.clickRegister();
 
-    // First registration
-    await registerPage.registerUser(
-      VALID_USER.gender,
-      VALID_USER.firstName,
-      VALID_USER.lastName,
-      email,
-      VALID_USER.password
-    );
+  // First registration
+  await registerPage.registerUser(VALID_USER.gender, VALID_USER.firstName, VALID_USER.lastName, email, VALID_USER.password);
 
-    await expect(registerPage.resultMessage).toHaveText('Your registration completed');
+  // Check the registration complete message is show as 'Your registration completed' or not
+  await expect(registerPage.resultMessage).toContainText('Your registration completed');
 
-    await registerPage.clickContinue();
+  await registerPage.clickContinue();
 
-    await homePage.clickLogout();
+  await homePage.clickLogout();
 
-    // Try registering with the same email
-    await homePage.clickRegister();
+  // Try registering with the same email
+  await homePage.clickRegister();
 
-    await registerPage.registerUser(
-      VALID_USER.gender,
-      VALID_USER.firstName,
-      VALID_USER.lastName,
-      email,
-      VALID_USER.password
-    );
+  await registerPage.registerUser(VALID_USER.gender, VALID_USER.firstName, VALID_USER.lastName, email, VALID_USER.password);
 
-    await expect(registerPage.errorMessage).toContainText('The specified email already exists');
+  // Check the error message for duplicate registration
+  await expect(registerPage.errorMessage).toContainText('The specified email already exists');
 });

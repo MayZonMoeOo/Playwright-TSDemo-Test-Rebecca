@@ -2,7 +2,7 @@
 Playwright automation testing for 'Demo Shop' website using TypeScript
 
 ## Prerequisites
-Need to install the following items before running the tests:
+The following tools are required to set up and run this project:
 - **Node.js** - [Download Node.js](https://nodejs.org/)
 - **Visual Studio Code (VS Code)** - [Download VS Code](https://code.visualstudio.com/)
 
@@ -41,7 +41,7 @@ npx playwright test
 ```
 * **Run a specific test file (e.g., Register test):**
 ```bash
-npx playwright test tests/Register.spec.ts
+npx playwright test tests/registertest.spec.ts
 ```
 * **View the HTML test report:**
 ```bash
@@ -54,7 +54,7 @@ npx playwright show-report
   * **Trace (`trace: 'on-first-retry'`):** Captures a trace file during the first retry for easier failure debugging.
   * **Screenshot (`screenshot: 'only-on-failure'`):** Automatically takes a screenshot only when a test fails.
   * **Workers (`workers: 1`):** 
-    > **⚠️ IMPORTANT:** Tests must run sequentially with a single worker (`workers: 1`) in both Local and CI/CD environments. Since multiple tests share the same user account (`VALID_USER`), parallel execution will cause state conflicts (e.g., cart/wishlist management overlapping between tests).
+    > **⚠️ IMPORTANT:** Tests are configured to run sequentially using a single worker (`workers: 1`) to reduce potential state conflicts caused by shared test accounts, shopping cart data, and wishlist data.
 
 ## 📝 Test Scenarios & Implementation
 
@@ -63,7 +63,7 @@ This project includes six automated test scenarios—implemented using Playwrigh
 ---
 
 
-### Scenario 1: Register New User
+### Scenario 1.1: Register New User
 * **File:** `tests/registertest.spec.ts`
 * **Test Name:** `Register New User`
 * **Flow:** Creates a new user successfully with valid details.
@@ -78,15 +78,17 @@ This project includes six automated test scenarios—implemented using Playwrigh
 ---
 
 
-### Register Existing User
+### Scenario 1.2: Register Existing User
 * **File:** `tests/registertest.spec.ts`
 * **Test Name:** `Register Existing User`
-* **Flow:** Prevents registration using an email that already exists.
+* **Flow:** Verifies that the application prevents duplicate registration using an email address that has already been registered during the test.
 * **Steps:** 
-  * Opens the register page.
-  * Tries to register again using the existing email.
+  * Registers a new user with a unique email address.
+  * Verifies successful registration.
+  * Logs out after registration.
+  * Attempts to register again using the same email address.
 * **Expected Result:** 
-  * Shows the error message: `"The specified email already exists"`.
+  * Displays the error message: `"The specified email already exists"`.
 
 ---
 
@@ -96,11 +98,18 @@ This project includes six automated test scenarios—implemented using Playwrigh
 * **Test Name:** `Login Test`
 * **Flow:** Allows a registered user to log in successfully.
 * **Steps:** 
-  * Opens the home page and clicks Login.
-  * Enters valid email and password.
+  * Registers a new user with a unique email address.
+  * Verifies the registration success message.
+  * Logs out after successful registration.
+  * Logs in again using the same email and password.
+  * Verifies the Welcome heading.
+  * Verifies the account email and Logout link.
+  * Logs out after successful login.
 * **Expected Result:** 
+  * Displays the Welcome heading after successful login.
   * The user's email is visible in the header.
   * The "Log out" link appears correctly.
+  * Successfully logs out after verification.
 
 ---
 
@@ -110,8 +119,10 @@ This project includes six automated test scenarios—implemented using Playwrigh
 * **Test Name:** `Invalid Login Test`
 * **Flow:** Shows error messages when logging in with incorrect credentials.
 * **Steps:**
-  * **Case A (Wrong Password):** Enters a valid email with a wrong password (`wrong`) and clicks Login.
-  * **Case B (Unregistered Email):** Enters a non-existent email with a password and clicks Login.
+  * Creates a new account with a unique email address.
+  * Logs out after registration.
+  * **Case A (Unregistered Email):** Attempts to log in using a non-existent email.
+  * **Case B (Wrong Password):** Attempts to log in using the registered email with an incorrect password (`wrong`).
 * **Expected Result:**
   * For wrong password, expects the error message: `Login was unsuccessful. Please correct the errors and try again.` and `The credentials provided are incorrect`.
   * For unregistered email, expects the error message: `Login was unsuccessful. Please correct the errors and try again.` and `No customer account found`.
@@ -121,17 +132,42 @@ This project includes six automated test scenarios—implemented using Playwrigh
 
 ### Scenario 4: Dashboard Test
 * **File:** `tests/dashboard.spec.ts`
-* **Test Name:** `Dashboard Test`
-* **Flow:** Tests hovering over the menu, filtering notebooks by display count and attributes, managing wishlist items, adding items to the shopping cart, and verifying notification messages and menu counts.
+* **Test Name:** `Dashboard Test with Encapsulated POM Actions & Expects`
+* **Flow:** Tests product searching, category navigation, product price validation, price filtering, wishlist management, shopping cart operations, and notification and quantity verification.
 * **Steps:**
-  * Hovers over the Computers Menu and clicks Notebooks.
-  * Selects 4 on the Display dropdown menu.
-  * Checks the '16GB' checkbox under Filter by attributes, then unchecks it.
-  * Adds the second and third items to the wishlist.
-  * Adds the fourth, fifth, and sixth items to the shopping cart.
+  * Clears existing items from the Shopping Cart and Wishlist before testing.
+  * Searches for Com in the store search bar and verifies the Computing and Internet product page.
+  * Hovers over the Computers menu and navigates to the Desktops category.
+  * Selects 4 from the Display dropdown menu.
+  * Verifies the Desktops category heading.
+  * Verifies all four product prices before applying the filter.
+  * Verifies the product count before filtering (4 products).
+  * Applies the $1200 price filter.
+  * Verifies the filtered product count (1 product).
+  * Verifies the filtered product price.
+  * Removes the price filter.
+  * Verifies that the product count returns to 4.
+  * Verifies all product prices after removing the filter.
+  * Adds the Black & White Diamond Heart product from the Jewelry category to the Wishlist.
+  * Verifies the Wishlist success notification and quantity (1).
+  * Adds the Blue and green Sneaker product from the Apparel & Shoes category to the Wishlist.
+  * Verifies the Wishlist success notification and quantity (2).
+  * Adds three products to the Shopping Cart:
+    - Build your own computer
+    - Build your own cheap computer
+    - 14.1-inch Laptop
+  * Verifies the full Shopping Cart success notification and cart quantity after each product addition (1, 2, and 3).
+  * Navigates to the Shopping Cart and Wishlist pages.
+  
 * **Expected Result:**
-  * Expects a notification text: The product has been added to your wishlist after adding each wishlist item.
-  * Expects a notification text: The product has been added to your shopping cart after adding each shopping cart item.
+  * Successfully searches for and verifies the Computing and Internet product page.
+  * Displays the correct Desktops category heading.
+  * Displays four products before filtering.
+  * Displays one product after applying the $1200 price filter.
+  * Displays four products again after removing the filter.
+  * Successfully adds two products to the Wishlist and verifies the Wishlist quantity.
+  * Successfully adds three products to the Shopping Cart.
+  * Verifies the full success notification and updated cart quantity after each product addition.
 
   ---
 
@@ -165,7 +201,7 @@ This project includes six automated test scenarios—implemented using Playwrigh
 * **Expected Result:**
   * Verifies that the number of elements in the Shopping Cart table decreases by 1 after each deletion.
   * Verifies that the Shopping Cart is completely empty.
-  * uccessfully closes the browser session.
+  * Successfully closes the browser session.
 
   ---
 

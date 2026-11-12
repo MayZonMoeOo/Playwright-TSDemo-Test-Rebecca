@@ -12,7 +12,7 @@ export class RegisterPage {
     readonly continueButton: Locator;
     readonly errorMessage: Locator;
 
-    constructor (page:Page) {
+    constructor(page: Page) {
         this.page = page;
         this.firstName = page.getByRole('textbox', { name: 'First name:' });
         this.lastName = page.getByRole('textbox', { name: 'Last name:' });
@@ -24,7 +24,7 @@ export class RegisterPage {
         this.continueButton = page.getByRole('button', { name: 'Continue' });
         this.errorMessage = page.locator('div.validation-summary-errors');
     }
-     async registerUser(gender: 'Male' | 'Female', firstName: string, lastName: string, email: string, pass: string) {
+    async registerUser(gender: 'Male' | 'Female', firstName: string, lastName: string, email: string, pass: string) {
         await this.page.getByRole('radio', { name: gender, exact: true }).check();
 
         await this.firstName.fill(firstName);

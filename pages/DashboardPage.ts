@@ -79,7 +79,6 @@ export class DashboardPage {
         await this.page.getByRole('link', { name: 'Build your own cheap computer', exact: true }).click();
         await this.page.getByRole('radio', { name: 'Fast [+100.00]' }).check();
         await this.page.getByRole('radio', { name: 'GB [+60.00]' }).check();
-        //await this.page.getByRole('radio', { name: '8GB [+60.00]' }).check();
         await this.page.getByRole('checkbox', { name: 'Office Suite [+100.00]' }).check();
         await this.page.locator('#add-to-cart-button-72').click();
 
